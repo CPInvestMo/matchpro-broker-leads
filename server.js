@@ -160,9 +160,26 @@ cron.schedule('0 */12 * * *', () => {
 updateLeads();
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ MatchPro Broker Leads System running on port ${PORT}`);
-  console.log(`📊 API: http://localhost:${PORT}/api/leads`);
-  console.log(`📥 Export: http://localhost:${PORT}/api/leads/export`);
+  console.log(`📊 API: http://0.0.0.0:${PORT}/api/leads`);
+  console.log(`📥 Export: http://0.0.0.0:${PORT}/api/leads/export`);
   console.log(`⏰ Auto-updates every 12 hours`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
